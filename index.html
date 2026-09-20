@@ -53,7 +53,7 @@
     } else if (!/^https:\/\//i.test(docSpaceUrl)) {
       renderError('Jupiter did not provide a valid ONLYOFFICE DocSpace URL.');
     } else {
-      const roomUrl = `${docSpaceUrl}/rooms/${encodeURIComponent(roomId)}`;
+      const roomUrl = `${docSpaceUrl}/rooms/shared/${encodeURIComponent(roomId)}/`;
       app.innerHTML = `
         <div class="kicker">Jupiter Office Studio</div>
         <h1>${escapeHtml(roomTitle)}</h1>
