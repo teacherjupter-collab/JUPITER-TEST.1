@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jupiter — Office Studio</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; }
+    html, body { margin: 0; min-height: 100%; background: #f6f7fb; color: #172033; }
+    .shell { max-width: 920px; margin: 0 auto; padding: 40px 20px; }
+    .card { background: white; border: 1px solid #d8e2ef; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(11,24,48,.08); }
+    .kicker { color: #667085; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+    h1 { margin: 8px 0 12px; color: #0b1830; }
+    p { line-height: 1.55; }
+    .button { display: inline-block; margin-top: 14px; padding: 12px 16px; border-radius: 12px; background: #2d7ff9; color: white; text-decoration: none; font-weight: 700; }
+    .note { margin-top: 16px; color: #667085; font-size: 13px; }
+    .error { border-color: #f2b8b5; background: #fff7f7; }
+    iframe { width: 100%; height: 76vh; min-height: 640px; border: 0; border-radius: 16px; background: white; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section id="app" class="card">Loading Office Studio…</section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const roomId = String(params.get('roomId') || '').trim();
+    const roomTitle = String(params.get('roomTitle') || 'Jupiter Office Studio').trim();
+    const docSpaceUrl = String(params.get('docSpaceUrl') || '').trim().replace(/\/+$/, '');
+    const app = document.getElementById('app');
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderError(message) {
+      app.className = 'card error';
+      app.innerHTML = `
+        <div class="kicker">Jupiter Office Studio</div>
+        <h1>Room link unavailable</h1>
+        <p>${escapeHtml(message)}</p>
+      `;
+    }
+
+    if (!roomId) {
+      renderError('Jupiter did not provide a room ID. Open Office Studio from your authenticated Jupiter portal.');
+    } else if (!/^https:\/\//i.test(docSpaceUrl)) {
+      renderError('Jupiter did not provide a valid ONLYOFFICE DocSpace URL.');
+    } else {
+      const roomUrl = `${docSpaceUrl}/rooms/${encodeURIComponent(roomId)}`;
+      app.innerHTML = `
+        <div class="kicker">Jupiter Office Studio</div>
+        <h1>${escapeHtml(roomTitle)}</h1>
+        <p>Your private ONLYOFFICE workspace is opening. If the embedded view does not load, use the button below.</p>
+        <p><a class="button" href="${roomUrl}" target="_blank" rel="noopener noreferrer">Open in ONLYOFFICE ↗</a></p>
+        <div class="note">Access is controlled by ONLYOFFICE. Jupiter does not expose API keys in this bridge.</div>
+        <div style="height: 18px"></div>
+        <iframe src="${roomUrl}" allow="clipboard-read; clipboard-write"></iframe>
+      `;
+    }
+  </script>
+</body>
+</html>
